@@ -1,27 +1,13 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.experimental.UtilityClass;
+import org.mapstruct.Mapper;
 import ru.practicum.shareit.item.model.Item;
 
-@UtilityClass
-public class ItemMapper {
+@Mapper(componentModel = "spring")
+public interface ItemMapper {
+    ItemDto toItemDto(Item item);
 
-    public static ItemDto toItemDto(Item item) {
-        return ItemDto.builder()
-                .id(item.getId())
-                .name(item.getName())
-                .description(item.getDescription())
-                .available(item.getAvailable())
-                .build();
-    }
+    Item toItem(ItemDto itemDto);
 
-    public static Item toItem(ItemDto itemDto) {
-        return Item.builder()
-                .id(itemDto.getId())
-                .name(itemDto.getName())
-                .description(itemDto.getDescription())
-                .available(itemDto.getAvailable())
-                .build();
-    }
-
+    ItemOwnerDto toItemOwnerDto(Item item);
 }

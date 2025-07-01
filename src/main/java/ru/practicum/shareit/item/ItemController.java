@@ -4,7 +4,9 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemOwnerDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.validation.Marker;
 
@@ -17,7 +19,7 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    public List<ItemDto> getOwnerItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<ItemOwnerDto> getOwnerItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
         return itemService.getOwnerItems(userId);
     }
 
@@ -46,5 +48,11 @@ public class ItemController {
     @GetMapping("/search")
     public List<ItemDto> searchItemsByText(@RequestParam String text) {
         return itemService.getItemsByText(text);
+    }
+
+    @PostMapping("{itemId}/comment")
+    public CommentDto addComment(@PathVariable Long itemId, @RequestBody CommentDto commentDto,
+                                 @RequestHeader("X-Sharer-User-Id") Long userId) {
+        return itemService.addComment(itemId, commentDto, userId);
     }
 }
