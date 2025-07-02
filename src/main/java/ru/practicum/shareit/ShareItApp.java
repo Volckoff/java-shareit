@@ -10,4 +10,7 @@ public class ShareItApp {
         SpringApplication.run(ShareItApp.class, args);
     }
 
+    /*
+    Александр Добрый день! Основные проблемы были с MapStruct, как я и думал
+     */
 }
