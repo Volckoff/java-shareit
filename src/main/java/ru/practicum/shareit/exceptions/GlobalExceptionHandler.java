@@ -27,6 +27,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DuplicateException.class)
     public ResponseEntity<Map<String, String>> handleDuplicateException(DuplicateException ex) {
+        log.error("Ошибка дублирования данных: {}", ex.getMessage());
         return new ResponseEntity<>(Map.of("Error", "Resource already exists", "Message", ex.getMessage()),
                 HttpStatus.CONFLICT
         );
@@ -53,7 +54,7 @@ public class GlobalExceptionHandler {
                 .map(violation -> violation.getMessage())
                 .findFirst()
                 .orElse("Ошибка валидации параметров");
-        log.warn("Constraint violation: {}", errorMessage);
+        log.warn("Ошибка валидации параметров: {}", errorMessage);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("error", "Validation failed", "message", errorMessage));
     }
@@ -64,6 +65,7 @@ public class GlobalExceptionHandler {
                 .map(ObjectError::getDefaultMessage)
                 .toList();
         Map<String, Object> body = Map.of("error", "Validation failed", "messages", messages);
+        log.error("Ошибка валидации: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
@@ -74,6 +76,7 @@ public class GlobalExceptionHandler {
         body.put("status", HttpStatus.CONFLICT.value());
         body.put("error", "BadRequestException Error");
         body.put("message", ex.getMessage());
+        log.error("Ошибка в запросе: {}", ex.getMessage(), ex);
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
 
@@ -84,6 +87,7 @@ public class GlobalExceptionHandler {
         body.put("status", HttpStatus.BAD_REQUEST.value());
         body.put("error", "Bad Request");
         body.put("message", ex.getMessage());
+        log.error("Ошибка коммента: {}", ex.getMessage(), ex);
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
