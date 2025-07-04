@@ -15,12 +15,17 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByBookerIdOrderByStartDesc(Long userId);
 
     List<Booking> findByItemOwnerIdOrderByStartDesc(Long ownerId);
+
     List<Booking> findByItemOwnerIdAndStatusOrderByStartDesc(Long ownerId, Status status);
+
     List<Booking> findByItemOwnerIdAndStartAfterOrderByStartDesc(Long ownerId, LocalDateTime start);
+
     List<Booking> findByItemOwnerIdAndEndBeforeOrderByStartDesc(Long ownerId, LocalDateTime end);
 
     List<Booking> findByBookerIdAndStatusOrderByStartDesc(Long userId, Status status);
+
     List<Booking> findByBookerIdAndStartAfterOrderByStartDesc(Long userId, LocalDateTime start);
+
     List<Booking> findByBookerIdAndEndBeforeOrderByStartDesc(Long userId, LocalDateTime end);
 
     @Query("""
