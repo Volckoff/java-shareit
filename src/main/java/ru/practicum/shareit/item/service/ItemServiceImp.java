@@ -45,6 +45,7 @@ public class ItemServiceImp implements ItemService {
     @Override
     @Transactional(readOnly = true)
     public List<ItemOwnerDto> getOwnerItems(Long userId) {
+
         log.info("Получение всех вещей владельца");
         userService.getUserById(userId);
         List<Item> items = itemRepository.findAllByOwnerId(userId);
@@ -52,17 +53,23 @@ public class ItemServiceImp implements ItemService {
             throw new NotFoundException(String.format("Предметы владельца с id = %d не найдены", userId));
         }
         List<Long> itemIds = items.stream().map(Item::getId).toList();
-        Map<Long, List<Comment>> commentsByItem = commentRepository.findAllByItemIds(itemIds)
+        Map<Long, List<Comment>> commentsByItem = commentRepository.findAllByItemIdIn(itemIds)
                 .stream()
                 .collect(Collectors.groupingBy(comment -> comment.getItem().getId()));
+        List<Booking> lastBookings = bookingRepository.findLastBookingsForItems(itemIds);
+        List<Booking> nextBookings = bookingRepository.findNextBookingsForItems(itemIds);
+        Map<Long, Booking> lastBookingsByItem = lastBookings.stream()
+                .collect(Collectors.toMap(booking -> booking.getItem().getId(), booking -> booking));
+        Map<Long, Booking> nextBookingsByItem = nextBookings.stream()
+                .collect(Collectors.toMap(booking -> booking.getItem().getId(), booking -> booking));
         return items.stream()
                 .map(item -> {
                     ItemOwnerDto itemOwnerDto = itemMapper.toItemOwnerDto(item);
-                    Booking lastBooking = bookingRepository.findLastBooking(item.getId());
+                    Booking lastBooking = lastBookingsByItem.get(item.getId());
                     if (lastBooking != null) {
                         itemOwnerDto.setLastBooking(bookingMapper.toBookingDto(lastBooking));
                     }
-                    Booking nextBooking = bookingRepository.findNextBooking(item.getId());
+                    Booking nextBooking = nextBookingsByItem.get(item.getId());
                     if (nextBooking != null) {
                         itemOwnerDto.setNextBooking(bookingMapper.toBookingDto(nextBooking));
                     }
@@ -70,7 +77,6 @@ public class ItemServiceImp implements ItemService {
                     itemOwnerDto.setComments(comments.stream()
                             .map(commentMapper::toCommentDto)
                             .collect(Collectors.toList()));
-
                     return itemOwnerDto;
                 }).toList();
     }

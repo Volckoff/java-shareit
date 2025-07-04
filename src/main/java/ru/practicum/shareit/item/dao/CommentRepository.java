@@ -11,8 +11,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     List<Comment> findAllByItemId(Long itemId);
 
-    @Query("SELECT c FROM Comment c WHERE c.item.id IN :itemIds")
-    List<Comment> findAllByItemIds(@Param("itemIds") List<Long> itemIds);
+    List<Comment> findAllByItemIdIn(List<Long> itemIds);
 
     @Query("SELECT COUNT(b) > 0" +
             " FROM Booking b " +

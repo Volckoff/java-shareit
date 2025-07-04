@@ -102,12 +102,13 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     public List<BookingDto> getUserBookings(Long userId, State state) {
         checkUser(userId);
+        LocalDateTime now = LocalDateTime.now();
         List<Booking> userBookings = switch (state) {
             case CURRENT -> bookingRepository.findCurrentBookingsByUser(userId);
-            case PAST -> bookingRepository.findPastBookingsByUser(userId);
-            case FUTURE -> bookingRepository.findFutureBookingsByUser(userId);
-            case WAITING -> bookingRepository.findWaitingBookingsByUser(userId);
-            case REJECTED -> bookingRepository.findRejectedBookingsByUser(userId);
+            case PAST -> bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(userId, now);
+            case FUTURE -> bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(userId, now);
+            case WAITING -> bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING);
+            case REJECTED -> bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, Status.REJECTED);
             default -> bookingRepository.findByBookerIdOrderByStartDesc(userId);
         };
         return userBookings.stream()
@@ -136,20 +137,17 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     public List<BookingDto> getOwnerBookings(Long ownerId, State state) {
         checkUser(ownerId);
-        List<Item> userItem = itemRepository.findAllByOwnerId(ownerId);
-        if (userItem.isEmpty()) {
-            throw new NotFoundException(String.format("Предметы пользователя с id = %d не найдены", ownerId));
-        }
-        List<Booking> userBookings = switch (state) {
-            case CURRENT -> bookingRepository.findCurrentBookingsByUser(ownerId);
-            case PAST -> bookingRepository.findPastBookingsByUser(ownerId);
-            case FUTURE -> bookingRepository.findFutureBookingsByUser(ownerId);
-            case WAITING -> bookingRepository.findWaitingBookingsByUser(ownerId);
-            case REJECTED -> bookingRepository.findRejectedBookingsByUser(ownerId);
-            default -> bookingRepository.findByBookerIdOrderByStartDesc(ownerId);
+        LocalDateTime now = LocalDateTime.now();
+        List<Booking> ownerBookings = switch (state) {
+            case CURRENT -> bookingRepository.findCurrentBookingsByOwner(ownerId);
+            case PAST -> bookingRepository.findByItemOwnerIdAndEndBeforeOrderByStartDesc(ownerId, now);
+            case FUTURE -> bookingRepository.findByItemOwnerIdAndStartAfterOrderByStartDesc(ownerId, now);
+            case WAITING -> bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(ownerId, Status.WAITING);
+            case REJECTED -> bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(ownerId, Status.REJECTED);
+            default -> bookingRepository.findByItemOwnerIdOrderByStartDesc(ownerId);
         };
-        return userBookings.stream()
-                .map(booking -> bookingMapper.toBookingDto(booking))
+        return ownerBookings.stream()
+                .map(bookingMapper::toBookingDto)
                 .toList();
     }
 }

@@ -1,6 +1,6 @@
 package ru.practicum.shareit.item.dto;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class CommentDto {
 
     private Long id;
-    @NotNull(message = "Текст комментария должен быть указан")
+    @NotBlank(message = "Текст комментария должен быть указан")
     private String text;
     private String authorName;
     private LocalDateTime created;
