@@ -34,13 +34,6 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<Map<String, String>> handleAccessDeniedException(AccessDeniedException ex) {
-        log.warn("Доступ запрещён: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(Map.of("error", "Forbidden", "message", ex.getMessage()));
-    }
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleAllUncaughtException(Exception ex) {
         log.error("Непредвиденная ошибка: ", ex);
@@ -68,17 +61,6 @@ public class GlobalExceptionHandler {
         Map<String, Object> body = Map.of("error", "Validation failed", "messages", messages);
         log.error("Ошибка валидации: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
-    }
-
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<Map<String, Object>> handleBadRequestException(BadRequestException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.CONFLICT.value());
-        body.put("error", "BadRequestException Error");
-        body.put("message", ex.getMessage());
-        log.error("Ошибка в запросе: {}", ex.getMessage(), ex);
-        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(CommentNotValidException.class)
