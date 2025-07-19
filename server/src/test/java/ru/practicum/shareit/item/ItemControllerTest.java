@@ -21,7 +21,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ItemController.class)
 class ItemControllerTest {
@@ -169,14 +170,4 @@ class ItemControllerTest {
         verify(itemService).getItemById(anyLong());
     }
 
-    @Test
-    void createItemWithInvalidRequestShouldReturnBadRequest() throws Exception {
-        ItemDto invalidItem = ItemDto.builder().build();
-
-        mockMvc.perform(post("/items")
-                        .header(USER_ID_HEADER, 1L)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidItem)))
-                .andExpect(status().isBadRequest());
-    }
 }

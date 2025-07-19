@@ -1,8 +1,6 @@
 package ru.practicum.shareit.item;
 
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -24,13 +22,13 @@ public class ItemController {
     }
 
     @GetMapping("/{id}")
-    public ItemDto getItemById(@Positive @PathVariable Long id) {
+    public ItemDto getItemById(@PathVariable Long id) {
         return itemService.getItemById(id);
     }
 
     @PostMapping
-    public ItemDto addItem(@RequestBody @Validated NewItemRequest newItemRequest,
-                              @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ItemDto addItem(@RequestBody NewItemRequest newItemRequest,
+                           @RequestHeader("X-Sharer-User-Id") Long userId) {
         return itemService.addItem(newItemRequest, userId);
     }
 

@@ -1,18 +1,14 @@
 package ru.practicum.shareit.exceptions;
 
-import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -38,36 +34,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleAllUncaughtException(Exception ex) {
         log.error("Непредвиденная ошибка: ", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", "Internal server error",
-                        "message", "Произошла внутренняя ошибка сервера"));
-    }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<Map<String, String>> handleConstraintViolationException(ConstraintViolationException ex) {
-        String errorMessage = ex.getConstraintViolations().stream()
-                .map(violation -> violation.getMessage())
-                .findFirst()
-                .orElse("Ошибка валидации параметров");
-        log.warn("Ошибка валидации параметров: {}", errorMessage);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("error", "Validation failed", "message", errorMessage));
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        List<String> messages = ex.getBindingResult().getAllErrors().stream()
-                .map(ObjectError::getDefaultMessage)
-                .toList();
-        Map<String, Object> body = Map.of("error", "Validation failed", "messages", messages);
-        log.error("Ошибка валидации: {}", ex.getMessage(), ex);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+                .body(Map.of("error", "Internal Server Error", "message", "Произошла внутренняя ошибка сервера"));
     }
 
     @ExceptionHandler(CommentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleCommentNotValidException(CommentNotValidException ex) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
         body.put("error", "Bad Request");
         body.put("message", ex.getMessage());
         log.error("Ошибка коммента: {}", ex.getMessage(), ex);
