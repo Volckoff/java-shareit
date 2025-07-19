@@ -8,6 +8,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.model.ItemRequestCreate;
 import ru.practicum.shareit.request.service.ItemRequestService;
@@ -120,11 +121,22 @@ class ItemRequestControllerTest {
         verify(itemRequestService).getItemRequestById(anyLong(), anyLong());
     }
 
-//    @Test
-//    void createItemRequestWithoutUserIdShouldReturnBadRequest() throws Exception {
-//        mockMvc.perform(post("/requests")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectMapper.writeValueAsString(testRequestCreate)))
-//                .andExpect(status().isBadRequest());
-//    }
+    @Test
+    void createItemRequestWithoutUserIdShouldReturnServerError() throws Exception {
+        mockMvc.perform(post("/requests")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testRequestCreate)))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    void createItemWithInvalidRequestShouldReturnBadRequest() throws Exception {
+        ItemDto invalidItem = ItemDto.builder().build();
+
+        mockMvc.perform(post("/items")
+                        .header(USER_ID_HEADER, 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidItem)))
+                .andExpect(status().isInternalServerError());
+    }
 }

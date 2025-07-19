@@ -109,6 +109,7 @@ public class ItemServiceImp implements ItemService {
 
     @Override
     public ItemDto addItem(NewItemRequest newItemRequest, Long userId) {
+
         UserDto ownerDto = userService.getUserById(userId);
         User owner = userMapper.toUser(ownerDto);
         Item item = new Item();
