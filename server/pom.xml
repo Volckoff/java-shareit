@@ -106,6 +106,12 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.12</version>
+                <configuration>
+                    <excludes>
+                        <exclude>ru/practicum/shareit/item/dto/*MapperImpl*</exclude>
+                        <exclude>ru/practicum/shareit/booking/dto/*MapperImpl*</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
